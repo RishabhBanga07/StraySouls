@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adopt a Pet - StrayCare</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .filter-section {
+            background: white;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group select {
+            padding: 8px;
+            border-radius: var(--radius);
+            border: 1px solid #ddd;
+        }
+
+        .pets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .pet-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .pet-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pet-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .pet-info {
+            padding: 1.5rem;
+        }
+
+        .pet-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pet-details {
+            display: flex;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .pet-tag {
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #e67e22;
+            /* Default: Urgent/Info */
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-paw"></i> StrayCare
+            </a>
+            <div class="nav-toggle"><i class="fas fa-bars"></i></div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="report.html">Report Stray</a></li>
+                <li><a href="adopt.html" class="active">Adopt</a></li>
+                <li><a href="medical.html">Medical Help</a></li>
+                <li><a href="donate.html">Donate</a></li>
+                <li><a href="heatmap.html">Heatmap</a></li>
+                <li id="auth-links"><!-- JS Populated --></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Filters -->
+    <section class="filter-section">
+        <div class="container">
+            <div class="filters">
+                <h3>Find your friend:</h3>
+                <div class="filter-group">
+                    <select id="type-filter" onchange="renderPets()">
+                        <option value="all">All Types</option>
+                        <option value="dog">Dogs</option>
+                        <option value="cat">Cats</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select id="age-filter" onchange="renderPets()">
+                        <option value="all">Any Age</option>
+                        <option value="puppy">Puppy/Kitten (< 1 yr)</option>
+                        <option value="adult">Adult (1-7 yrs)</option>
+                        <option value="senior">Senior (7+ yrs)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content -->
+    <div class="container mb-2">
+        <h1 class="text-center mb-1">Pets Waiting for a Home</h1>
+        <div class="pets-grid" id="pets-container">
+            <!-- Pets will be injected here -->
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Mock Data
+        const pets = [
+            {
+                id: 1,
+                name: "Buddy",
+                type: "dog",
+                ageGroup: "adult",
+                age: "3 yrs",
+                image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=500&q=60",
+                location: "Central Shelter",
+                vaccinated: true
+            },
+            {
+                id: 2,
+                name: "Whiskers",
+                type: "cat",
+                ageGroup: "puppy",
+                age: "6 mos",
+                image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=500&q=60",
+                location: "North Side Foster",
+                vaccinated: false
+            },
+            {
+                id: 3,
+                name: "Rex",
+                type: "dog",
+                ageGroup: "senior",
+                age: "8 yrs",
+                image: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=500&q=60",
+                location: "Happy Paws NGO",
+                vaccinated: true
+            },
+            {
+                id: 4,
+                name: "Luna",
+                type: "cat",
+                ageGroup: "adult",
+                age: "2 yrs",
+                image: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=500&q=60",
+                location: "City Shelter",
+                vaccinated: true
+            },
+            {
+                id: 5,
+                name: "Max",
+                type: "dog",
+                ageGroup: "puppy",
+                age: "4 mos",
+                image: "https://images.unsplash.com/photo-1591769225440-811ad7d6eca6?auto=format&fit=crop&w=500&q=60",
+                location: "East End Rescue",
+                vaccinated: true
+            }
+        ];
+
+        function renderPets() {
+            const container = document.getElementById('pets-container');
+            const typeFilter = document.getElementById('type-filter').value;
+            const ageFilter = document.getElementById('age-filter').value;
+
+            container.innerHTML = '';
+
+            const filtered = pets.filter(pet => {
+                if (typeFilter !== 'all' && pet.type !== typeFilter) return false;
+                if (ageFilter !== 'all' && pet.ageGroup !== ageFilter) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-center">No pets match your criteria.</p>';
+                return;
+            }
+
+            filtered.forEach(pet => {
+                const card = `
+                    <div class="pet-card">
+                        <img src="${pet.image}" alt="${pet.name}" class="pet-image">
+                        <div class="pet-info">
+                            <div class="pet-name">
+                                ${pet.name}
+                                ${pet.vaccinated ? '<span class="status-badge" style="background:#2ecc71;">Vaccinated</span>' : ''}
+                            </div>
+                            <div class="pet-details">
+                                <span class="pet-tag">${pet.type}</span>
+                                <span class="pet-tag">${pet.age}</span>
+                            </div>
+                            <p class="mb-1"><i class="fas fa-map-marker-alt"></i> ${pet.location}</p>
+                            <button class="btn btn-outline" style="width:100%" onclick="adoptPet(${pet.id})">Adopt Me</button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        function adoptPet(id) {
+            const pet = pets.find(p => p.id === id);
+            showAlert(`Request to adopt ${pet.name} sent to ${pet.location}!`);
+        }
+
+        // Initial Render
+        renderPets();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Heatmap - StrayCare</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <style>
+        .map-container {
+            width: 100%;
+            height: 70vh;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            /* Leaflet needs a defined height */
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .legend {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><i class="fas fa-paw"></i> StrayCare</a>
+            <div class="nav-toggle"><i class="fas fa-bars"></i></div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="report.html">Report Stray</a></li>
+                <li><a href="adopt.html">Adopt</a></li>
+                <li><a href="medical.html">Medical Help</a></li>
+                <li><a href="donate.html">Donate</a></li>
+                <li><a href="heatmap.html" class="active">Heatmap</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 2rem;">
+        <h1 class="text-center mb-1">Stray Animal Density Heatmap</h1>
+        <p class="text-center mb-2">Real-time visualization of reported stray animals and critical zones.</p>
+
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="dot" style="background: red;"></div> High Urgency
+            </div>
+            <div class="legend-item">
+                <div class="dot" style="background: orange;"></div> Medium Urgency
+            </div>
+            <div class="legend-item">
+                <div class="dot" style="background: green;"></div> Low Urgency
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        // Initialize Map
+        // Default view centered on a generic location (e.g., city center)
+        // In a real app, we might center on user's location
+        const map = L.map('map').setView([28.6139, 77.2090], 12); // New Delhi coordinates as default
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // Marker Icons
+        const getIcon = (urgency) => {
+            let color = 'green';
+            if (urgency === 'high') color = 'red';
+            if (urgency === 'medium') color = 'orange';
+
+            // Simple colored circle markers using standard Leaflet DivIcon or just default markers with different hues
+            // For simplicity, we'll use standard markers but we could use custom icons.
+            // Let's use CircleMarker for a "heat" map feel
+            return color;
+        };
+
+        const addMarker = (report) => {
+            const color = getIcon(report.urgency);
+
+            const circle = L.circleMarker([report.location.lat, report.location.lng], {
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.5,
+                radius: 10
+            }).addTo(map);
+
+            const popupContent = `
+                <b>${report.animalType.toUpperCase()}</b><br>
+                Urgency: ${report.urgency}<br>
+                ${report.description ? report.description : ''}<br>
+                <img src="${report.image}" style="width:100px; margin-top:5px; border-radius:4px;">
+            `;
+
+            circle.bindPopup(popupContent);
+        };
+
+        // Fetch existing reports
+        fetch('/api/reports')
+            .then(res => res.json())
+            .then(reports => {
+                reports.forEach(report => {
+                    addMarker(report);
+                });
+            })
+            .catch(err => console.error('Error fetching reports:', err));
+
+        // Socket.io for Real-time updates
+        const socket = io();
+
+        socket.on('new-report', (report) => {
+            addMarker(report);
+            // Optional: Notification or toast
+            // alert('New stray reported nearby!'); 
+        });
+
+    </script>
+</body>
+
+</html>

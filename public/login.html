@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - StrayCare</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auth-container {
+            min-height: calc(100vh - 200px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 0;
+            background-color: var(--background-light);
+        }
+
+        .auth-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h2 {
+            color: var(--primary-color);
+        }
+
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-option {
+            border: 2px solid #ddd;
+            padding: 0.5rem;
+            text-align: center;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .role-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .switch-auth {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .switch-auth a {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Simplified Navbar for Auth Page -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-paw"></i> StrayCare
+            </a>
+            <a href="index.html" class="btn btn-outline" style="padding: 5px 15px; font-size: 0.9rem;">Back to Home</a>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+
+            <!-- Login Form -->
+            <div id="login-form">
+                <div class="auth-header">
+                    <h2>Welcome Back</h2>
+                    <p>Login to continue helping strays</p>
+                </div>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" class="form-control" required placeholder="name@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control" required placeholder="********">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                </form>
+                <div class="switch-auth">
+                    <p>Don't have an account? <a href="#" onclick="toggleAuth('signup')">Sign Up</a></p>
+                </div>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-form" class="hidden">
+                <div class="auth-header">
+                    <h2>Join StrayCare</h2>
+                    <p>Create an account to get started</p>
+                </div>
+                <form onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" class="form-control" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" class="form-control" required placeholder="name@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>I am a...</label>
+                        <select class="form-control" id="role-select" onchange="toggleShelterFields()">
+                            <option value="user">Concerned Citizen</option>
+                            <option value="volunteer">Volunteer</option>
+                            <option value="shelter">Shelter / NGO</option>
+                        </select>
+                    </div>
+
+                    <!-- Extra fields for Shelter (hidden by default) -->
+                    <div id="shelter-fields" class="hidden">
+                        <div class="form-group">
+                            <label>Organization Name</label>
+                            <input type="text" class="form-control" placeholder="Happy Paws Shelter">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control" required placeholder="Create a password">
+                    </div>
+
+                    <button type="submit" class="btn btn-secondary" style="width: 100%;">Create Account</button>
+                </form>
+                <div class="switch-auth">
+                    <p>Already have an account? <a href="#" onclick="toggleAuth('login')">Login</a></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Auth Logic
+        function toggleAuth(mode) {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+
+            if (mode === 'signup') {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+            } else {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+            }
+        }
+
+        function toggleShelterFields() {
+            const role = document.getElementById('role-select').value;
+            const shelterFields = document.getElementById('shelter-fields');
+            if (role === 'shelter') {
+                shelterFields.classList.remove('hidden');
+            } else {
+                shelterFields.classList.add('hidden');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            // Mock Login
+            const mockUser = { name: "Test User", role: "user" };
+            localStorage.setItem('strayCareUser', JSON.stringify(mockUser));
+            showAlert("Login Successful! Redirecting...");
+            setTimeout(() => window.location.href = 'dashboard.html', 1000);
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+            const role = document.getElementById('role-select').value;
+            // Mock Signup
+            const mockUser = { name: "New User", role: role };
+            localStorage.setItem('strayCareUser', JSON.stringify(mockUser));
+            showAlert("Account Created! Redirecting...");
+            setTimeout(() => window.location.href = 'dashboard.html', 1000);
+        }
+
+        // Check URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'signup') {
+            toggleAuth('signup');
+        }
+    </script>
+</body>
+
+</html>

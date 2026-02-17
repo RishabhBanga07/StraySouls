@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shelter Registration - StrayCare</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><i class="fas fa-paw"></i> StrayCare</a>
+            <a href="index.html" class="btn btn-outline" style="padding: 5px 15px; font-size: 0.9rem;">Back</a>
+        </div>
+    </nav>
+
+    <div class="container" style="padding: 3rem 20px;">
+        <div class="card" style="max-width: 700px; margin: 0 auto;">
+            <h2 class="text-center mb-1 text-primary">Partner With Us</h2>
+            <p class="text-center mb-2">Register your Shelter or NGO to reach more animals in need.</p>
+
+            <form onsubmit="handleShelterReg(event)">
+                <div class="form-group">
+                    <label>Organization Name</label>
+                    <input type="text" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Registration Number (if applicable)</label>
+                    <input type="text" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Person</label>
+                    <input type="text" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Email</label>
+                    <input type="email" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Address / Location</label>
+                    <textarea class="form-control" rows="2" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Capacity</label>
+                    <input type="number" class="form-control" placeholder="Max number of animals" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Services Offered</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-weight: normal;"><input type="checkbox"> Medical Treatment / Vet
+                            On-site</label>
+                        <label style="font-weight: normal;"><input type="checkbox"> Long-term Shelter</label>
+                        <label style="font-weight: normal;"><input type="checkbox"> Adoption Center</label>
+                        <label style="font-weight: normal;"><input type="checkbox"> Spay/Neuter Program</label>
+                        <label style="font-weight: normal;"><input type="checkbox"> Ambulance Service</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Upload Certification / Logo</label>
+                    <input type="file" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script>
+        function handleShelterReg(e) {
+            e.preventDefault();
+            showAlert("Application Submitted! We will review and contact you shortly.");
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+    </script>
+</body>
+
+</html>

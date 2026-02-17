@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - StrayCare</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard-header {
+            background: white;
+            padding: 2rem 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 2rem;
+        }
+
+        .user-welcome {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tab-nav {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #7f8c8d;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: -2px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .status-tracker {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-pending {
+            background-color: #f39c12;
+        }
+
+        .status-resolved {
+            background-color: #2ecc71;
+        }
+
+        .status-process {
+            background-color: #3498db;
+        }
+
+        .item-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            .item-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><i class="fas fa-paw"></i> StrayCare</a>
+            <div class="nav-toggle"><i class="fas fa-bars"></i></div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="report.html">Report Stray</a></li>
+                <li><a href="adopt.html">Adopt</a></li>
+                <li><a href="donate.html">Donate</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-header">
+        <div class="container user-welcome">
+            <div>
+                <h1>Hello, <span id="user-name">User</span>!</h1>
+                <p>Welcome to your dashboard.</p>
+            </div>
+            <div class="text-primary" style="font-size: 2rem;">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="min-height: 50vh;">
+
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('reports')">My Reports</button>
+            <button class="tab-btn" onclick="switchTab('adoptions')">Adoption Requests</button>
+            <button class="tab-btn" onclick="switchTab('tasks')">Volunteer Tasks</button> <!-- Visible to volunteers -->
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content active">
+            <h3 class="mb-1">Recent Reports</h3>
+            <div class="item-card">
+                <div>
+                    <h4>Injured Dog at MG Road</h4>
+                    <p class="text-sm">Reported on: 12 Jan 2024</p>
+                    <div class="status-tracker">
+                        <span class="status-dot status-resolved"></span> Resolved - Rescued by Shelter
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm">View Details</button>
+            </div>
+            <div class="item-card">
+                <div>
+                    <h4>Stray Kittens near Park</h4>
+                    <p class="text-sm">Reported on: 14 Feb 2024</p>
+                    <div class="status-tracker">
+                        <span class="status-dot status-pending"></span> Pending Volunteer Assignment
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm">View Details</button>
+            </div>
+        </div>
+
+        <!-- Adoptions Tab -->
+        <div id="adoptions" class="tab-content">
+            <h3 class="mb-1">My Adoption Applications</h3>
+            <div class="item-card">
+                <div>
+                    <h4>Application for 'Buddy'</h4>
+                    <p class="text-sm">Submitted on: 10 Feb 2024</p>
+                    <div class="status-tracker">
+                        <span class="status-dot status-process"></span> Under Review (Home Visit Scheduled)
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm">Contact Shelter</button>
+            </div>
+        </div>
+
+        <!-- Tasks Tab (Volunteer View) -->
+        <div id="tasks" class="tab-content">
+            <h3 class="mb-1">Nearby Tasks (Volunteer)</h3>
+            <div class="item-card" style="border-left: 4px solid var(--accent-color);">
+                <div>
+                    <h4><i class="fas fa-ambulance"></i> Pickup Injured Bird</h4>
+                    <p>Location: Sector 45 (2km away)</p>
+                    <p class="text-sm text-primary">High Priority</p>
+                </div>
+                <button class="btn btn-primary btn-sm">Accept Task</button>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="container footer-bottom">
+            <p>&copy; <span id="current-year"></span> StrayCare.</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Init Dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('strayCareUser'));
+            if (user) {
+                document.getElementById('user-name').textContent = user.name;
+                // If not volunteer, maybe hide tasks tab? Keeping simple for now.
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        function switchTab(tabId) {
+            // Remove active class from all contents and details
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            // Add active to selected
+            document.getElementById(tabId).classList.add('active');
+
+            // Find button that calls this function (rough way)
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                if (btn.innerText.toLowerCase().includes(tabId) ||
+                    (tabId === 'reports' && btn.innerText.includes('Reports')) ||
+                    (tabId === 'adoptions' && btn.innerText.includes('Adoption')) ||
+                    (tabId === 'tasks' && btn.innerText.includes('Tasks'))) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
