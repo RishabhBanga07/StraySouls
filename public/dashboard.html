@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - StrayCare</title>
+    <title>Dashboard - StraySouls</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -101,7 +101,7 @@
 
     <nav class="navbar">
         <div class="container nav-container">
-            <a href="index.html" class="logo"><i class="fas fa-paw"></i> StrayCare</a>
+            <a href="index.html" class="logo"><i class="fas fa-paw"></i> StraySouls</a>
             <div class="nav-toggle"><i class="fas fa-bars"></i></div>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
@@ -190,7 +190,7 @@
 
     <footer>
         <div class="container footer-bottom">
-            <p>&copy; <span id="current-year"></span> StrayCare.</p>
+            <p>&copy; <span id="current-year"></span> StraySouls.</p>
         </div>
     </footer>
 
@@ -198,7 +198,7 @@
     <script>
         // Init Dashboard
         document.addEventListener('DOMContentLoaded', () => {
-            const user = JSON.parse(localStorage.getItem('strayCareUser'));
+            const user = JSON.parse(localStorage.getItem('straySoulsUser'));
             if (user) {
                 document.getElementById('user-name').textContent = user.name;
                 // If not volunteer, maybe hide tasks tab? Keeping simple for now.

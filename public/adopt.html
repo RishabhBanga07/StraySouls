@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adopt a Pet - StrayCare</title>
+    <title>Adopt a Pet - StraySouls</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -95,7 +95,7 @@
     <nav class="navbar">
         <div class="container nav-container">
             <a href="index.html" class="logo">
-                <i class="fas fa-paw"></i> StrayCare
+                <i class="fas fa-paw"></i> StraySouls
             </a>
             <div class="nav-toggle"><i class="fas fa-bars"></i></div>
             <ul class="nav-links">
@@ -143,71 +143,159 @@
     </div>
 
     <script src="js/script.js"></script>
+
+    <!-- Appointment Modal -->
+    <div id="appointment-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Book Appointment</h2>
+            <p>Meet <span id="modal-pet-name"></span> at <span id="modal-pet-location"></span></p>
+            <form id="appointment-form">
+                <input type="hidden" id="modal-pet-id">
+                <div class="form-group">
+                    <label for="date">Preferred Date</label>
+                    <input type="date" id="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message (Optional)</label>
+                    <textarea id="message" class="form-control" rows="3"
+                        placeholder="Any specific questions?"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+
     <script>
-        // Mock Data
-        const pets = [
-            {
-                id: 1,
-                name: "Buddy",
-                type: "dog",
-                ageGroup: "adult",
-                age: "3 yrs",
-                image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=500&q=60",
-                location: "Central Shelter",
-                vaccinated: true
-            },
-            {
-                id: 2,
-                name: "Whiskers",
-                type: "cat",
-                ageGroup: "puppy",
-                age: "6 mos",
-                image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=500&q=60",
-                location: "North Side Foster",
-                vaccinated: false
-            },
-            {
-                id: 3,
-                name: "Rex",
-                type: "dog",
-                ageGroup: "senior",
-                age: "8 yrs",
-                image: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=500&q=60",
-                location: "Happy Paws NGO",
-                vaccinated: true
-            },
-            {
-                id: 4,
-                name: "Luna",
-                type: "cat",
-                ageGroup: "adult",
-                age: "2 yrs",
-                image: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=500&q=60",
-                location: "City Shelter",
-                vaccinated: true
-            },
-            {
-                id: 5,
-                name: "Max",
-                type: "dog",
-                ageGroup: "puppy",
-                age: "4 mos",
-                image: "https://images.unsplash.com/photo-1591769225440-811ad7d6eca6?auto=format&fit=crop&w=500&q=60",
-                location: "East End Rescue",
-                vaccinated: true
+        let allPets = [];
+
+        async function fetchPets() {
+            try {
+                const response = await fetch('http://localhost:3000/api/reports');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const reports = await response.json();
+
+                // Helper for Friendly Names
+                const getFriendlyName = (id, type) => {
+                    if (!id) return "Stray " + (type || "Animal");
+                    const names = ["Buddy", "Max", "Bella", "Charlie", "Lucy", "Daisy", "Rocky", "Luna", "Coco", "Milo", "Teddy", "Sadie", "Ruby", "Zeus", "Oliver", "Leo", "Duke", "Bear", "Tucker", "Jack", "Penny", "Bailey", "Chloe", "Lola"];
+                    let hash = 0;
+                    for (let i = 0; i < id.length; i++) {
+                        hash = id.charCodeAt(i) + ((hash << 5) - hash);
+                    }
+                    return names[Math.abs(hash) % names.length];
+                };
+
+                // Helper for Random Locations (Ludhiana)
+                const getRandomLocation = (id) => {
+                    const locations = [
+                        "Sarabha Nagar, Ludhiana", "Model Town, Ludhiana", "Civil Lines, Ludhiana",
+                        "BRS Nagar, Ludhiana", "Dugri, Ludhiana", "Ferozepur Road, Ludhiana",
+                        "Ghumar Mandi, Ludhiana", "Pakhowal Road, Ludhiana", "Haibowal, Ludhiana",
+                        "Kitchlu Nagar, Ludhiana", "Agar Nagar, Ludhiana", "Rishi Nagar, Ludhiana"
+                    ];
+                    let hash = 0;
+                    if (id) {
+                        for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash);
+                    }
+                    return locations[Math.abs(hash) % locations.length];
+                };
+
+                // Transform reports to pets format safely
+                allPets = reports.map(report => {
+                    try {
+                        const cleanType = (report.animalType || 'animal').toLowerCase();
+                        const typeMap = {
+                            dog: 'dog,puppy',
+                            cat: 'cat,kitten',
+                            bird: 'bird',
+                            other: 'wildlife'
+                        };
+                        const keyword = typeMap[cleanType] || 'animal';
+
+                        // Reuse hash logic for stable random image
+                        let imgHash = 0;
+                        if (report._id) {
+                            for (let i = 0; i < report._id.length; i++) imgHash = report._id.charCodeAt(i) + ((imgHash << 5) - imgHash);
+                        }
+                        const lockId = Math.abs(imgHash);
+                        // Using lock ensures the same pet always gets the same random image
+                        let imageUrl = `https://loremflickr.com/600/400/${keyword}?lock=${lockId}`;
+
+                        const animalType = report.animalType ? report.animalType.charAt(0).toUpperCase() + report.animalType.slice(1) : 'Unknown';
+                        const friendlyName = getFriendlyName(report._id, report.animalType);
+                        const randomLocation = getRandomLocation(report._id);
+
+                        return {
+                            id: report._id,
+                            name: `${friendlyName} (Stray ${animalType})`,
+                            type: report.animalType ? report.animalType.toLowerCase() : 'other',
+                            image: imageUrl,
+                            location: randomLocation,
+                            vaccinated: false,
+                            urgency: report.urgency || 'low'
+                        };
+                    } catch (e) {
+                        console.warn('Skipping invalid report:', report, e);
+                        return null;
+                    }
+                }).filter(pet => pet !== null); // Filter out failed mappings
+
+                renderPets();
+            } catch (err) {
+                console.error('Error fetching pets:', err);
+                showToast('Failed to load pets: ' + err.message, 'error');
             }
-        ];
+        }
 
         function renderPets() {
             const container = document.getElementById('pets-container');
             const typeFilter = document.getElementById('type-filter').value;
-            const ageFilter = document.getElementById('age-filter').value;
+            // Removed age filter logic as we don't have age data yet
 
             container.innerHTML = '';
 
-            const filtered = pets.filter(pet => {
+            const filtered = allPets.filter(pet => {
                 if (typeFilter !== 'all' && pet.type !== typeFilter) return false;
-                if (ageFilter !== 'all' && pet.ageGroup !== ageFilter) return false;
                 return true;
             });
 
@@ -219,18 +307,17 @@
             filtered.forEach(pet => {
                 const card = `
                     <div class="pet-card">
-                        <img src="${pet.image}" alt="${pet.name}" class="pet-image">
+                        <img src="${pet.image}" alt="${pet.name}" class="pet-image" onerror="this.onerror=null;this.src='images/placeholder.svg';">
                         <div class="pet-info">
                             <div class="pet-name">
                                 ${pet.name}
-                                ${pet.vaccinated ? '<span class="status-badge" style="background:#2ecc71;">Vaccinated</span>' : ''}
+                                <!-- Urgency badge removed -->
                             </div>
                             <div class="pet-details">
                                 <span class="pet-tag">${pet.type}</span>
-                                <span class="pet-tag">${pet.age}</span>
                             </div>
                             <p class="mb-1"><i class="fas fa-map-marker-alt"></i> ${pet.location}</p>
-                            <button class="btn btn-outline" style="width:100%" onclick="adoptPet(${pet.id})">Adopt Me</button>
+                            <button class="btn btn-outline" style="width:100%" onclick="openBookingModal('${pet.id}')">Book Appointment</button>
                         </div>
                     </div>
                 `;
@@ -238,13 +325,75 @@
             });
         }
 
-        function adoptPet(id) {
-            const pet = pets.find(p => p.id === id);
-            showAlert(`Request to adopt ${pet.name} sent to ${pet.location}!`);
+        function getUrgencyColor(urgency) {
+            if (urgency === 'high') return '#e74c3c';
+            if (urgency === 'medium') return '#f39c12';
+            return '#2ecc71';
         }
 
-        // Initial Render
-        renderPets();
+        // Modal Logic
+        const modal = document.getElementById('appointment-modal');
+        const closeBtn = document.querySelector('.close-modal');
+
+        function openBookingModal(petId) {
+            const user = localStorage.getItem('straySoulsUser');
+            if (!user) {
+                showToast('Please login to book an appointment', 'error');
+                delayedRedirect('login.html');
+                return;
+            }
+
+            const pet = allPets.find(p => p.id === petId);
+            document.getElementById('modal-pet-name').textContent = pet.name;
+            document.getElementById('modal-pet-location').textContent = pet.location;
+            document.getElementById('modal-pet-id').value = pet.id;
+
+            modal.classList.remove('hidden');
+        }
+
+        if (closeBtn) closeBtn.onclick = () => modal.classList.add('hidden');
+        window.onclick = (e) => {
+            if (e.target == modal) modal.classList.add('hidden');
+        }
+
+        // Handle Booking
+        const aptForm = document.getElementById('appointment-form');
+        if (aptForm) {
+            aptForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const reportId = document.getElementById('modal-pet-id').value;
+                const date = document.getElementById('date').value;
+                const message = document.getElementById('message').value;
+                const token = localStorage.getItem('straySoulsToken');
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/appointments', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-auth-token': token
+                        },
+                        body: JSON.stringify({ reportId, date, message })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showToast('Appointment booked successfully!', 'success');
+                        modal.classList.add('hidden');
+                    } else {
+                        showToast(data.msg || data.error || 'Booking failed', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast('Server error', 'error');
+                }
+            });
+        }
+
+        // Initialize directly
+        fetchPets();
     </script>
 </body>
 

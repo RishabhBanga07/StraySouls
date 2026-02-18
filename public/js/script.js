@@ -1,5 +1,5 @@
 /**
- * StrayCare - Main JavaScript
+ * StraySouls - Main JavaScript
  */
 
 // Navigation Toggle
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Mock Authentication (localStorage)
 function checkAuth() {
-    const user = JSON.parse(localStorage.getItem('strayCareUser'));
+    const user = JSON.parse(localStorage.getItem('straySoulsUser'));
     const authLinks = document.getElementById('auth-links');
     
     if (authLinks) {
@@ -37,21 +37,55 @@ function checkAuth() {
         } else {
             authLinks.innerHTML = `
                 <a href="login.html" class="btn btn-outline">Login</a>
-                <a href="login.html?mode=signup" class="btn btn-primary">Sign Up</a>
+                <a href="signup.html" class="btn btn-primary">Sign Up</a>
             `;
         }
     }
 }
 
 function logout() {
-    localStorage.removeItem('strayCareUser');
+    localStorage.removeItem('straySoulsUser');
     window.location.href = 'index.html';
 }
 
-// Utility: Show Alert
-function showAlert(message, type = 'success') {
-    // In a real app, this would be a nice toast notification
-    alert(message);
+// Utility: Toast Notification
+function showToast(message, type = 'success') {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <span>${message}</span>
+        <i class="fas fa-times" style="cursor: pointer;" onclick="this.parentElement.remove()"></i>
+    `;
+
+    container.appendChild(toast);
+
+    // Trigger reflow
+    void toast.offsetWidth;
+
+    // Show
+    toast.classList.add('show');
+
+    // Auto hide
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+
+// Global generic redirect with delay for smooth UX
+function delayedRedirect(url, delay = 1500) {
+    setTimeout(() => {
+        window.location.href = url;
+    }, delay);
 }
 
 // Utility: Mock API Call

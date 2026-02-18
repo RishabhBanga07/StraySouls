@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report a Stray - StrayCare</title>
+    <title>Report a Stray - StraySouls</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Maps script placeholder -->
@@ -80,7 +80,7 @@
     <nav class="navbar">
         <div class="container nav-container">
             <a href="index.html" class="logo">
-                <i class="fas fa-paw"></i> StrayCare
+                <i class="fas fa-paw"></i> StraySouls
             </a>
             <div class="nav-toggle">
                 <i class="fas fa-bars"></i>
@@ -172,7 +172,7 @@
 
     <footer>
         <div class="container footer-bottom">
-            <p>&copy; <span id="current-year"></span> StrayCare.</p>
+            <p>&copy; <span id="current-year"></span> StraySouls.</p>
         </div>
     </footer>
 
@@ -251,14 +251,14 @@
             formData.append('description', description);
 
             try {
-                const response = await fetch('/api/reports', {
+                const response = await fetch('http://localhost:3000/api/reports', {
                     method: 'POST',
                     body: formData
                 });
 
                 if (response.ok) {
-                    alert('Report submitted successfully! Thank you for helping.');
-                    setTimeout(() => window.location.href = 'heatmap.html', 1500);
+                    showToast('Report submitted successfully!', 'success');
+                    delayedRedirect('heatmap.html');
                 } else {
                     const error = await response.json();
                     alert('Error submitting report: ' + error.error);

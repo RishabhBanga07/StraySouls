@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Heatmap - StrayCare</title>
+    <title>Live Heatmap - StraySouls</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -51,7 +51,7 @@
 <body>
     <nav class="navbar">
         <div class="container nav-container">
-            <a href="index.html" class="logo"><i class="fas fa-paw"></i> StrayCare</a>
+            <a href="index.html" class="logo"><i class="fas fa-paw"></i> StraySouls</a>
             <div class="nav-toggle"><i class="fas fa-bars"></i></div>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
@@ -92,7 +92,7 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <!-- Socket.io -->
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
 
     <script>
         // Initialize Map
@@ -127,18 +127,36 @@
                 radius: 10
             }).addTo(map);
 
+            // Friendly Name Logic
+            const names = ["Buddy", "Max", "Bella", "Charlie", "Lucy", "Daisy", "Rocky", "Luna", "Coco", "Milo", "Teddy", "Sadie", "Ruby", "Zeus", "Oliver", "Leo", "Duke", "Bear", "Tucker", "Jack", "Penny", "Bailey", "Chloe", "Lola"];
+            let hash = 0;
+            if (report._id) {
+                for (let i = 0; i < report._id.length; i++) {
+                    hash = report._id.charCodeAt(i) + ((hash << 5) - hash);
+                }
+            }
+            const friendlyName = names[Math.abs(hash) % names.length];
+            const displayName = `${friendlyName} (Stray ${report.animalType ? report.animalType.toUpperCase() : 'ANIMAL'})`;
+
+            // Image URL Logic
+            let imageUrl = report.image || '';
+            if (imageUrl && !imageUrl.startsWith('http')) {
+                const path = imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl;
+                imageUrl = 'http://localhost:3000' + encodeURI(path);
+            }
+
             const popupContent = `
-                <b>${report.animalType.toUpperCase()}</b><br>
+                <b>${displayName}</b><br>
                 Urgency: ${report.urgency}<br>
                 ${report.description ? report.description : ''}<br>
-                <img src="${report.image}" style="width:100px; margin-top:5px; border-radius:4px;">
+                <img src="${imageUrl}" style="width:100px; margin-top:5px; border-radius:4px;" onerror="this.onerror=null;this.src='images/placeholder.svg';">
             `;
 
             circle.bindPopup(popupContent);
         };
 
         // Fetch existing reports
-        fetch('/api/reports')
+        fetch('http://localhost:3000/api/reports')
             .then(res => res.json())
             .then(reports => {
                 reports.forEach(report => {
@@ -148,7 +166,7 @@
             .catch(err => console.error('Error fetching reports:', err));
 
         // Socket.io for Real-time updates
-        const socket = io();
+        const socket = io('http://localhost:3000');
 
         socket.on('new-report', (report) => {
             addMarker(report);
